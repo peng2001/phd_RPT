@@ -1,17 +1,9 @@
-heatflux_file = 'data/test_J1_cell/J1_throughplane_15-20.csv'
-
 import os
 import pandas as pd
 import numpy as np
 from io import StringIO
 import toml
-
-heat_flux_sign = 1 # 1 or -1; 1 means heat flux entering the cell is positive; -1 means heat flux entering cell is negative
-T_S = 20 # deg C, final temperature
-L = 0.0057 # meters, 1/2 cell thickness (L)
-deltaT = 5  # degrees C, magnitude of step change
-fitting_time_skip = 40 # seconds, integer, ignore first points because of overshoot
-cell_mass_density = 2465 # kg/m^3
+from variables import *
 
 
 def calculate_sensitivity(S_0, S_C, T_S, T_0=22.5):
