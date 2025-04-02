@@ -1,4 +1,4 @@
-heatflux_file = 'data/test_J1_cell/J1_heatgen_2C.csv'
+heatflux_file = 'data/test_J1_cell/J1_heatgen_0.75C.csv'
 
 heat_flux_sign = 1 # 1 or -1; 1 means heat flux entering the cell is positive; -1 means heat flux entering cell is negative
 T_S = 20 # deg C, final temperature

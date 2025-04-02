@@ -53,12 +53,12 @@ time_at_max_slope = HeatfluxData.time_elapsed[max_slope_index]
 
 start_time = min(time_at_max_slope, time_at_min_slope) + 300
 end_time = max(time_at_max_slope, time_at_min_slope) - 300
-HeatfluxData = HeatfluxData[HeatfluxData.time_elapsed <= end_time + 2000] # cut out all extra data points at end
+HeatfluxData = HeatfluxData[HeatfluxData.time_elapsed <= end_time + 3000] # cut out all extra data points at end
 heatflux_slopes = np.gradient(HeatfluxData.average_heatflux, HeatfluxData.time_elapsed) # recalculate slopes
 
 heat_fluxes_gen = [heatflux for t, heatflux in zip(HeatfluxData.time_elapsed, HeatfluxData.average_heatflux) if start_time <= t <= end_time] # the heat fluxes within start time and end time (during the pulsing)
 heat_fluxes_gen_average = np.mean(heat_fluxes_gen)
-loss_start_index = len(HeatfluxData.average_heatflux) - 1000 # 1000 seconds before final measurement
+loss_start_index = len(HeatfluxData.average_heatflux) - 500 # 500 seconds before final measurement
 loss_calc_times = HeatfluxData.time_elapsed[loss_start_index:]  # Corresponding time values
 loss_calc_heatflux = HeatfluxData.average_heatflux[loss_start_index:]  # Last 500 heat flux values
 losses_average = np.mean(loss_calc_heatflux)
