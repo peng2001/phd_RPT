@@ -1,4 +1,4 @@
-from setup_sabine import *
+from setup_sabine_heatgen import *
 import matplotlib.pyplot as plt
 from scipy.signal import savgol_filter
 import math
