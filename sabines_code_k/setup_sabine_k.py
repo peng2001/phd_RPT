@@ -1,7 +1,14 @@
-heatflux_file = 'data/test_J1_cell/J1_heatgen_2C.csv'
+import os
+import pandas as pd
+import numpy as np
+from io import StringIO
+import toml
+from variables import *
+
+heatflux_file = 'data/Sabines Rig J1PA/J1PA_throughplane_15-20_sabine.csv'
 
 heat_flux_sign = 1 # 1 or -1; 1 means heat flux entering the cell is positive; -1 means heat flux entering cell is negative
-T_S = 25 # deg C, final temperature
+T_S = 20 # deg C, final temperature
 L = 0.0057 # meters, 1/2 cell thickness (L)
 deltaT = 5  # degrees C, magnitude of step change
 fitting_time_skip = 30 # seconds, integer, ignore first points because of overshoot

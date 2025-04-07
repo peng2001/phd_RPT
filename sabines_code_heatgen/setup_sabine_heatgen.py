@@ -1,4 +1,4 @@
-directory = 'data/Sabines Rig data/2.25C 25 deg C'
+directory = 'data/Sabines Rig J1/2C 25 deg C'
 T_S = 25 # degrees C
 
 
