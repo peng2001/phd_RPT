@@ -8,7 +8,12 @@ import math
 ##########################################################
 # finding start time of the model
 heatflux_slopes = np.gradient(HeatfluxData.average_heatflux, HeatfluxData.time_elapsed)
-indices_step = np.where(heatflux_slopes > 5)[0] # indices where the slope is greater than X
+if heat_flux_sign == 1:
+    indices_step = np.where(heatflux_slopes > 5)[0] # indices where the slope is greater than X
+elif heat_flux_sign == -1:
+    indices_step = np.where(heatflux_slopes < -5)[0] # indices where the slope is less than X (greater than -X)
+else:
+    raise ValueError("initial_value_guess in setup.py should be 1 or -1")
 start_change_tempreature_time = HeatfluxData.time_elapsed[indices_step[0]] # time where target temperature for peltiers is changed 
 target_temperature_reached_time = HeatfluxData.time_elapsed[indices_step[-1]] # time where the target temperature is reached
 
@@ -17,7 +22,12 @@ slopes_after_step = heatflux_slopes[indices_step[-1] + 20:] # only the data poin
 seconds_after_step = HeatfluxData.time_elapsed[indices_step[-1] + 20:]
 moving_averages = np.convolve(slopes_after_step, np.ones(100)/100, mode='valid') # window size of 50, to get moving average of last 50 slopes
 indices_steady = slopes_after_step[indices_step[-1] + 20:]
-indices_end = np.where(moving_averages > 0.01)[0] # indices where the slope is less than than Y (greater than negative y)
+if heat_flux_sign == 1:
+    indices_end = np.where(moving_averages > -0.001)[0] # indices where the slope is less than than Y (greater than negative y)
+elif heat_flux_sign == -1:
+    indices_end = np.where(moving_averages < 0.001)[0] # indices where the slope is greater than than Y
+else:
+    raise ValueError("initial_value_guess in setup.py should be 1 or -1")
 steady_state_time = seconds_after_step.iloc[indices_end[0]]
 
 start_time = target_temperature_reached_time # start time elapsed to fit equation, seconds, where the target temperature for step change is reached
