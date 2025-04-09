@@ -11,7 +11,7 @@ heatflux_slopes = np.gradient(HeatfluxData.average_heatflux, HeatfluxData.time_e
 if heat_flux_sign == 1:
     indices_step = np.where(heatflux_slopes > 5)[0] # indices where the slope is greater than X
 elif heat_flux_sign == -1:
-    indices_step = np.where(heatflux_slopes < -5)[0] # indices where the slope is less than X (greater than -X)
+    indices_step = np.where(heatflux_slopes < -5)[0] # indices where the slope is less than X
 else:
     raise ValueError("initial_value_guess in setup.py should be 1 or -1")
 start_change_tempreature_time = HeatfluxData.time_elapsed[indices_step[0]] # time where target temperature for peltiers is changed 
@@ -23,9 +23,9 @@ seconds_after_step = HeatfluxData.time_elapsed[indices_step[-1] + 20:]
 moving_averages = np.convolve(slopes_after_step, np.ones(100)/100, mode='valid') # window size of 50, to get moving average of last 50 slopes
 indices_steady = slopes_after_step[indices_step[-1] + 20:]
 if heat_flux_sign == 1:
-    indices_end = np.where(moving_averages > -0.001)[0] # indices where the slope is less than than Y (greater than negative y)
+    indices_end = np.where(moving_averages > -0.001)[0]+300 # indices where the slope is less than than Y (greater than negative y)
 elif heat_flux_sign == -1:
-    indices_end = np.where(moving_averages < 0.001)[0] # indices where the slope is greater than than Y
+    indices_end = np.where(moving_averages < 0.001)[0]+300 # indices where the slope is greater than than Y
 else:
     raise ValueError("initial_value_guess in setup.py should be 1 or -1")
 steady_state_time = seconds_after_step.iloc[indices_end[0]]
@@ -174,7 +174,7 @@ def run_fitting():
     diffusivity = (diffusivityEminus5)*10**(-5)
     diffusivity_error = (diffusivityEminus5_error)*10**(-5)
     # print("Heat flux offset: "+str(round_4_sig(heat_flux_offset))+" W/m^2")
-    # graph_heat_vs_time(HeatfluxData.time_elapsed, HeatfluxData.average_heatflux)
+    graph_heat_vs_time(HeatfluxData.time_elapsed, HeatfluxData.average_heatflux)
     graph_heat_vs_time_and_fitted_eqn(time_window, heat_fluxes, adjusted_heat_flux, conductivity,diffusivityEminus5,heat_flux_offset=0)
 
     return conductivity, diffusivity, conductivity_error, diffusivity_error
