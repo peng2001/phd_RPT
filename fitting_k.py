@@ -60,6 +60,7 @@ def fit_exponential(time_list, heat_flux_list):
     tau_guess = 50
     popt, pcov = curve_fit(exponential, time_list, heat_flux_list, p0=[initial_value_guess, asymptote_guess, tau_guess])
     fitted_initial, fitted_asymptote, fitted_tau = popt
+    print(fitted_tau)
     return fitted_initial, fitted_asymptote, fitted_tau
 
 def fit_heat_flux_equation(time_list, heat_flux_list):

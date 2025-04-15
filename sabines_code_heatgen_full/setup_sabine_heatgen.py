@@ -1,4 +1,4 @@
-directory = 'data/Sabines Rig J1/2C 25 deg C'
+directory = 'data/Sabines Rig J1/3C 25 deg C'
 T_S = 25 # degrees C
 
 
@@ -122,6 +122,23 @@ for file in files:
 
 HeatfluxData["average_heatflux"] = HeatfluxData.iloc[:, 1:].mean(axis=1)
 HeatfluxData["time_elapsed"] = (HeatfluxData.time - HeatfluxData.time.iloc[0]).dt.total_seconds()
+
+# # graphing data
+# import matplotlib.pyplot as plt
+# # Filter columns that start with 'HeatFlux'
+# heatflux_columns = [col for col in HeatfluxData.columns if col.startswith('HeatFlux')]
+# # Plot each HeatFlux column
+# plt.figure(figsize=(12, 6))
+# for col in heatflux_columns:
+#     plt.plot(HeatfluxData['time_elapsed'], HeatfluxData[col], label=col)
+
+# plt.xlabel("Time Elapsed (s)")
+# plt.ylabel("Heat Flux (W/m²)")
+# plt.title("Heat Flux vs Time Elapsed")
+# plt.legend(loc='upper right', fontsize='small', ncol=2)
+# plt.grid(True)
+# plt.tight_layout()
+# plt.show()
 
 # try:
 #     del metadata_lines, data_lines, lines, line, data, data_section, key, txt_file_path, value

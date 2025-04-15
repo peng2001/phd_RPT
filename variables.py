@@ -1,4 +1,4 @@
-heatflux_file = 'data/test_J1PA/J1PA_throughplane_25-30.csv'
+heatflux_file = 'data/test_J1PA/J1PA_throughplane_25-30_again_4.csv'
 T_S = 30 # deg C, final temperature
 
 heat_flux_sign = -1 # 1 or -1; 1 means heat flux entering the cell is positive; -1 means heat flux entering cell is negative
