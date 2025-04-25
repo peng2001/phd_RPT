@@ -145,7 +145,7 @@ def run_fitting():
     # print("Heat flux offset: "+str(round_4_sig(heat_flux_offset))+" W/m^2")
     initial_loss_index = next(i for i, t in enumerate(HeatfluxData.time_elapsed) if t >= start_change_tempreature_time) - 5 # 5 points before the start time to get initial loss
     prev_100_points = HeatfluxData.average_heatflux[(initial_loss_index-100):initial_loss_index] # get prev 100 points to get the average initial loss
-    initial_loss_estimate = sum(prev_100_points) / len(prev_100_points)
+    initial_loss_estimate = (sum(prev_100_points) / len(prev_100_points)) * S_final / S_initial # multiply by S_final / S_initial because different calibration temperature before step change
     # print("Initial loss: "+str(initial_loss_estimate))
 
     fitted_initial, fitted_asymptote, fitted_tau = fit_exponential(time_window_for_fitting, heat_fluxes_for_fitting)

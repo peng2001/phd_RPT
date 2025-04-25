@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 from io import StringIO
-heatflux_file = 'data/Sabines Rig J1PA/J1PA_throughplane_20-25_sabine_again_3.csv'
+heatflux_file = 'data/Sabines Rig J1PA/50soc/J1PA_throughplane_20-25_sabine_again_3.csv'
 T_S = 25 # deg C, final temperature
 
 heat_flux_sign = -1 # 1 or -1; 1 means heat flux entering the cell is positive; -1 means heat flux entering cell is negative
@@ -38,6 +38,8 @@ calibration_data['Correction factor Sc'] = pd.to_numeric(calibration_data['Corre
 HeatfluxData=pd.DataFrame()
 HeatfluxData['time'] = pd.to_datetime(sensor_data['Unnamed: 0'], unit='s')
 
+S_list_final = []
+S_list_initial = []
 for column in sensor_data.columns[1:]:
     sensor_id = '003066-' +column[-3:]
     # print(T_S)
@@ -47,8 +49,11 @@ for column in sensor_data.columns[1:]:
     S_0 = calibration_row['Sensitivity S0']
     S_C = calibration_row['Correction factor Sc']
     S = calculate_sensitivity(S_0, S_C, T_S)
-
+    S_list_final.append(S)
+    S_list_initial.append(calculate_sensitivity(S_0, S_C, T_S-deltaT))
     HeatfluxData['HeatFlux' + column] = calculate_heatflux_vectorized(sensor_data[column], S)
+S_final = np.mean(S_list_final)
+S_initial = np.mean(S_list_initial)
 
 HeatfluxData.drop(columns=['HeatFluxA0_C05', 'HeatFluxC0_D01'], inplace=True)
 HeatfluxData["average_heatflux"] = HeatfluxData.iloc[:, 1:].mean(axis=1)

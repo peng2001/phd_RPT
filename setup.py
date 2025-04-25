@@ -28,6 +28,8 @@ calibration_data['Correction factor Sc'] = pd.to_numeric(calibration_data['Corre
 HeatfluxData=pd.DataFrame()
 HeatfluxData['time'] = pd.to_datetime(sensor_data['Unnamed: 0'], format='%H:%M:%S').dt.time
 
+S_list_final = []
+S_list_initial = []
 for column in sensor_data.columns[1:]:
     if column.startswith("heatflux_"):
         sensor_id = column.split("heatflux_")[1]
@@ -36,8 +38,11 @@ for column in sensor_data.columns[1:]:
         S_0 = calibration_row['Sensitivity S0']
         S_C = calibration_row['Correction factor Sc']
         S = calculate_sensitivity(S_0, S_C, T_S)
-
+        S_list_final.append(S)
+        S_list_initial.append(calculate_sensitivity(S_0, S_C, T_S-deltaT))
         HeatfluxData[column] = calculate_heatflux_vectorized(sensor_data[column], S)
+S_final = np.mean(S_list_final)
+S_initial = np.mean(S_list_initial)
 
 HeatfluxData["average_heatflux"] = HeatfluxData.iloc[:, 1:].mean(axis=1)
 HeatfluxData["time_elapsed"] = HeatfluxData['time'].apply(lambda t: t.hour * 3600 + t.minute * 60 + t.second)
