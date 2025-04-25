@@ -2,8 +2,8 @@ import os
 import pandas as pd
 import numpy as np
 from io import StringIO
-heatflux_file = 'data/Sabines Rig J1PA/50soc/J1PA_throughplane_20-25_sabine_again_3.csv'
-T_S = 25 # deg C, final temperature
+heatflux_file = 'data/Sabines Rig J1PA/100soc/J1PA_throughplane_100soc_35-40_sabine.csv'
+T_S = 40 # deg C, final temperature
 
 heat_flux_sign = -1 # 1 or -1; 1 means heat flux entering the cell is positive; -1 means heat flux entering cell is negative
 L = 0.0057 # meters, 1/2 cell thickness (L)
