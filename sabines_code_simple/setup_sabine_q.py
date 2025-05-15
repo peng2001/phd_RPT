@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 from io import StringIO
-heatflux_file = 'data/Sabines Rig J1PA/J1PA_heatgen_1C_25deg_again_3.csv'
+heatflux_file = 'data/J1PA aged cell 33/50soc/J1PAaged33_heatgen_50soc_1.5C_25deg.csv'
 T_S = 25 # deg C, final temperature
 
 heat_flux_sign = -1 # 1 or -1; 1 means heat flux entering the cell is positive; -1 means heat flux entering cell is negative
@@ -50,24 +50,24 @@ for column in sensor_data.columns[1:]:
 
     HeatfluxData['HeatFlux' + column] = calculate_heatflux_vectorized(sensor_data[column], S)
 
-HeatfluxData.drop(columns=['HeatFluxA0_C05', 'HeatFluxC0_D01', 'HeatFluxD0_D07', 'HeatFluxB0_C13', ], inplace=True)
+# HeatfluxData.drop(columns=['HeatFluxA0_C05', 'HeatFluxC0_D01', 'HeatFluxD0_D07', 'HeatFluxB0_C13'], inplace=True)
 HeatfluxData["average_heatflux"] = HeatfluxData.iloc[:, 1:].mean(axis=1)
 HeatfluxData["time_elapsed"] = HeatfluxData['time'].apply(lambda t: t.hour * 3600 + t.minute * 60 + t.second)
 HeatfluxData = HeatfluxData.dropna()
 
 # graphing data
-# import matplotlib.pyplot as plt
-# # Filter columns that start with 'HeatFlux'
-# heatflux_columns = [col for col in HeatfluxData.columns if col.startswith('HeatFlux')]
-# # Plot each HeatFlux column
-# plt.figure(figsize=(12, 6))
-# for col in heatflux_columns:
-#     plt.plot(HeatfluxData['time_elapsed'], HeatfluxData[col], label=col)
+import matplotlib.pyplot as plt
+# Filter columns that start with 'HeatFlux'
+heatflux_columns = [col for col in HeatfluxData.columns if col.startswith('HeatFlux')]
+# Plot each HeatFlux column
+plt.figure(figsize=(12, 6))
+for col in heatflux_columns:
+    plt.plot(HeatfluxData['time_elapsed'], HeatfluxData[col], label=col)
 
-# plt.xlabel("Time Elapsed (s)")
-# plt.ylabel("Heat Flux (W/m²)")
-# plt.title("Heat Flux vs Time Elapsed")
-# plt.legend(loc='upper right', fontsize='small', ncol=2)
-# plt.grid(True)
-# plt.tight_layout()
-# plt.show()
+plt.xlabel("Time Elapsed (s)")
+plt.ylabel("Heat Flux (W/m²)")
+plt.title("Heat Flux vs Time Elapsed")
+plt.legend(loc='upper right', fontsize='small', ncol=2)
+plt.grid(True)
+plt.tight_layout()
+plt.show()

@@ -27,8 +27,8 @@ def calculate_total_heatflux(heatflux_subtract_losses): # input output from heat
     bottom_side = []
 
     heatflux_subtract_losses["top_flux"] = (
-        # heatflux_subtract_losses['HeatFluxD0_D07'] +
-        # heatflux_subtract_losses['HeatFluxC0_D01'] +
+        heatflux_subtract_losses['HeatFluxD0_D07'] +
+        heatflux_subtract_losses['HeatFluxC0_D01'] +
         2 * heatflux_subtract_losses['HeatFluxD1_D08'] +
         2 * heatflux_subtract_losses['HeatFluxD2_D11'] +
         heatflux_subtract_losses['HeatFluxD3_D12'] +
@@ -40,13 +40,13 @@ def calculate_total_heatflux(heatflux_subtract_losses): # input output from heat
     ) * area
 
     heatflux_subtract_losses["bottom_flux"] = (
-        # heatflux_subtract_losses['HeatFluxB0_C13'] +
+        heatflux_subtract_losses['HeatFluxB0_C13'] +
         heatflux_subtract_losses['HeatFluxB6_C14'] +
         5 * heatflux_subtract_losses['HeatFluxA2_C07'] +
         5 * heatflux_subtract_losses['HeatFluxA4_C08'] +
-        # heatflux_subtract_losses['HeatFluxA0_C05'] +
+        heatflux_subtract_losses['HeatFluxA0_C05'] +
         heatflux_subtract_losses['HeatFluxA6_C11']
-    ) * area * 28/24 # * 28/24 because of the measurements from A0, B0, C0, and D0 not being good
+    ) * area * 24/24 # * 28/24 because of the measurements from A0, B0, C0, and D0 not being good
 
     filtered_data = heatflux_subtract_losses[(heatflux_subtract_losses["time_elapsed"] >= start_time) & (heatflux_subtract_losses["time_elapsed"] <= end_time)]
     top_side = filtered_data["top_flux"]

@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 from io import StringIO
-heatflux_file = 'data/Sabines Rig J1PA/100soc/J1PA_throughplane_100soc_35-40_sabine.csv'
+heatflux_file = 'data/J1PA aged cell 33/50soc/J1PAaged33_throughplane_50soc_35-40_again_2.csv'
 T_S = 40 # deg C, final temperature
 
 heat_flux_sign = -1 # 1 or -1; 1 means heat flux entering the cell is positive; -1 means heat flux entering cell is negative
@@ -55,7 +55,7 @@ for column in sensor_data.columns[1:]:
 S_final = np.mean(S_list_final)
 S_initial = np.mean(S_list_initial)
 
-HeatfluxData.drop(columns=['HeatFluxA0_C05', 'HeatFluxC0_D01'], inplace=True)
+# HeatfluxData.drop(columns=['HeatFluxA0_C05', 'HeatFluxC0_D01'], inplace=True)
 HeatfluxData["average_heatflux"] = HeatfluxData.iloc[:, 1:].mean(axis=1)
 HeatfluxData["time_elapsed"] = HeatfluxData['time'].apply(lambda t: t.hour * 3600 + t.minute * 60 + t.second)
 HeatfluxData = HeatfluxData.dropna()
@@ -63,11 +63,11 @@ HeatfluxData = HeatfluxData.dropna()
 # graphing data
 import matplotlib.pyplot as plt
 # Filter columns that start with 'HeatFlux'
-# heatflux_columns = [col for col in HeatfluxData.columns if col.startswith('HeatFlux')]
+heatflux_columns = [col for col in HeatfluxData.columns if col.startswith('HeatFlux')]
 # Plot each HeatFlux column
-# plt.figure(figsize=(12, 6))
-# for col in heatflux_columns:
-#     plt.plot(HeatfluxData['time_elapsed'], HeatfluxData[col], label=col)
+plt.figure(figsize=(12, 6))
+for col in heatflux_columns:
+    plt.plot(HeatfluxData['time_elapsed'], HeatfluxData[col], label=col)
 
 # plt.xlabel("Time Elapsed (s)")
 # plt.ylabel("Heat Flux (W/m²)")

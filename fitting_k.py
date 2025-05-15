@@ -10,12 +10,14 @@ import math
 heatflux_slopes = np.gradient(HeatfluxData.average_heatflux, HeatfluxData.time_elapsed)
 if heat_flux_sign == 1:
     indices_step = np.where(heatflux_slopes > 5)[0] # indices where the slope is greater than X
+    target_temperature_reached_time = HeatfluxData.time_elapsed[HeatfluxData.average_heatflux.idxmax()]
 elif heat_flux_sign == -1:
-    indices_step = np.where(heatflux_slopes < -5)[0] # indices where the slope is less than X
+    indices_step = np.where(heatflux_slopes < -5)[0] # indices where the slope is less than X (greater than -X)
+    target_temperature_reached_time = HeatfluxData.time_elapsed[HeatfluxData.average_heatflux.idxmin()]
 else:
     raise ValueError("initial_value_guess in setup.py should be 1 or -1")
 start_change_tempreature_time = HeatfluxData.time_elapsed[indices_step[0]] # time where target temperature for peltiers is changed 
-target_temperature_reached_time = HeatfluxData.time_elapsed[indices_step[-1]] # time where the target temperature is reached
+#target_temperature_reached_time = HeatfluxData.time_elapsed[indices_step[-1]] # time where the target temperature is reached
 
 
 slopes_after_step = heatflux_slopes[indices_step[-1] + 20:] # only the data points after the step change
@@ -28,7 +30,10 @@ elif heat_flux_sign == -1:
     indices_end = np.where(moving_averages < 0.001)[0]+300 # indices where the slope is greater than than Y
 else:
     raise ValueError("initial_value_guess in setup.py should be 1 or -1")
-steady_state_time = seconds_after_step.iloc[indices_end[0]]
+if indices_end[0] >= len(seconds_after_step): # checks if index + 300 is out of bounds
+    steady_state_time = seconds_after_step.iloc[-1]
+else:
+    steady_state_time = seconds_after_step.iloc[indices_end[0]]
 
 start_time = target_temperature_reached_time # start time elapsed to fit equation, seconds, where the target temperature for step change is reached
 # start_time = (start_change_tempreature_time + target_temperature_reached_time) / 2 # start time elapsed to fit equation, seconds, halfway between start of step change and end of step change
@@ -60,7 +65,7 @@ def fit_exponential(time_list, heat_flux_list):
     tau_guess = 50
     popt, pcov = curve_fit(exponential, time_list, heat_flux_list, p0=[initial_value_guess, asymptote_guess, tau_guess])
     fitted_initial, fitted_asymptote, fitted_tau = popt
-    print(fitted_tau)
+    print("tau (s): "+str(fitted_tau))
     return fitted_initial, fitted_asymptote, fitted_tau
 
 def fit_heat_flux_equation(time_list, heat_flux_list):
@@ -98,9 +103,11 @@ def graph_heat_vs_time_and_fitted_eqn(exp_time, exp_heatflux, adjusted_heat_flux
 
 def graph_heat_vs_time(exp_time, exp_heatflux):
     plt.plot(exp_time, exp_heatflux)
+    # plt.plot(exp_time, np.gradient(exp_heatflux, exp_time), label="slope")
     plt.xlabel('Time (seconds)')
     plt.ylabel('Heat Flux (W/m^2)')
     plt.title('Heat Flux over Time')
+    # plt.legend()
     plt.axvline(x=start_time, color='r', linestyle='--')
     plt.axvline(x=end_time, color='r', linestyle='--')
 
@@ -137,6 +144,7 @@ def run_fitting():
     # print("Conductivity stderr: "+str(conductivity_error)+" W/(m*K)")
     # print("Diffusivity stderr: "+str(diffusivity_error)+" m^2/s")
     # print("Heat flux offset: "+str(round_4_sig(heat_flux_offset))+" W/m^2")
+
     initial_loss_index = next(i for i, t in enumerate(HeatfluxData.time_elapsed) if t >= start_change_tempreature_time) - 5 # 5 points before the start time to get initial loss
     prev_100_points = HeatfluxData.average_heatflux[(initial_loss_index-100):initial_loss_index] # get prev 100 points to get the average initial loss
     initial_loss_estimate = sum(prev_100_points) / len(prev_100_points) * S_final / S_initial # multiply by S_final / S_initial because different calibration temperature before step change
@@ -149,22 +157,23 @@ def run_fitting():
     # print(fitted_asymptote)
     # print(fitted_tau)
     losses = [exponential(t, initial=initial_loss_estimate, asymptote=fitted_asymptote, tau=fitted_tau) for t in time_window]
+    # losses = np.zeros(len(time_window))+fitted_asymptote
     linspace_time = np.arange(time_window[0]+fitting_time_skip, time_window[-1], 1)
     adjusted_heat_flux = np.subtract(heat_fluxes, losses)
     adjusted_heat_fluxes_for_fitting = [adjusted_heat_flux[i] for i in range(len(time_window)) if time_window[i] >= fitting_time_skip]
     fitted_exponential = [exponential(t, fitted_initial, fitted_asymptote, fitted_tau) for t in linspace_time]
-    plt.plot(time_window, heat_fluxes, label="Experimental", color="blue")
-    plt.plot(time_window, losses, label="Losses", color="green")
-    plt.plot(time_window, adjusted_heat_flux, label="Heat flux with losses adjusted", color="purple")
-    plt.axhline(y=initial_loss_estimate, color='green', linestyle='--')
-    plt.axhline(y=fitted_asymptote, color='green', linestyle='--')
-    linspace_time_overshoot = np.arange(2, fitting_time_skip+1, 1)
-    plt.plot(linspace_time, fitted_exponential, color="black", label="Fitted Exponential to Data")
-    plt.xlabel('Time (seconds)')
-    plt.ylabel('Heat Flux (W/m^2)')
-    plt.legend()
-    plt.title('Heat Flux over Time')
-    plt.show()
+    # plt.plot(time_window, heat_fluxes, label="Experimental", color="blue") #UNCOMMENT
+    # plt.plot(time_window, losses, label="Losses", color="green")
+    # plt.plot(time_window, adjusted_heat_flux, label="Heat flux with losses adjusted", color="purple")
+    # plt.axhline(y=initial_loss_estimate, color='green', linestyle='--')
+    # plt.axhline(y=fitted_asymptote, color='green', linestyle='--')
+    # linspace_time_overshoot = np.arange(2, fitting_time_skip+1, 1)
+    # plt.plot(linspace_time, fitted_exponential, color="black", label="Fitted Exponential to Data")
+    # plt.xlabel('Time (seconds)')
+    # plt.ylabel('Heat Flux (W/m^2)')
+    # plt.legend()
+    # plt.title('Heat Flux over Time')
+    # plt.show()
 
     result = fit_heat_flux_equation(time_window_for_fitting, adjusted_heat_fluxes_for_fitting)
     # heat_flux_offset = result.params['heat_flux_offset'].value
@@ -175,19 +184,20 @@ def run_fitting():
     diffusivity = (diffusivityEminus5)*10**(-5)
     diffusivity_error = (diffusivityEminus5_error)*10**(-5)
     # print("Heat flux offset: "+str(round_4_sig(heat_flux_offset))+" W/m^2")
-    graph_heat_vs_time(HeatfluxData.time_elapsed, HeatfluxData.average_heatflux)
-    graph_heat_vs_time_and_fitted_eqn(time_window, heat_fluxes, adjusted_heat_flux, conductivity,diffusivityEminus5,heat_flux_offset=0)
+    # graph_heat_vs_time(HeatfluxData.time_elapsed, HeatfluxData.average_heatflux) #UNCOMMENT
+    # graph_heat_vs_time_and_fitted_eqn(time_window, heat_fluxes, adjusted_heat_flux, conductivity,diffusivityEminus5,heat_flux_offset=0) #UNCOMMENT
 
     return conductivity, diffusivity, conductivity_error, diffusivity_error
 
 
 
 if __name__ == "__main__":
+    # graph_heat_vs_time(HeatfluxData["time_elapsed"], HeatfluxData["average_heatflux"]) #UNCOMMENT
     print("Fitting using measured parameters")
     conductivity, diffusivity, conductivity_error, diffusivity_error = run_fitting()
     print("**Results**")
     print("Conductivity: "+str(abs(round_sig(conductivity,4)))+" W/(m*K)")
     print("Diffusivity: "+str(abs(round_sig(diffusivity,4)))+" m^2/s")
     print("Specific Heat: "+str(abs(round_sig(conductivity/(diffusivity*cell_mass_density),4)))+" m^2/s")
-    # print("Conductivity stderr: "+str(conductivity_error)+" W/(m*K)")
-    # print("Diffusivity stderr: "+str(diffusivity_error)+" m^2/s")
+    print("Conductivity stderr: "+str(100*conductivity_error/conductivity)+"%")
+    print("Diffusivity stderr: "+str(100*diffusivity_error/diffusivity)+"%")
