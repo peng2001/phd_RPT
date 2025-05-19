@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 from io import StringIO
-heatflux_file = 'data/J1PA aged cell 33/50soc/J1PAaged33_throughplane_50soc_35-40_again_2.csv'
+heatflux_file = 'data/J1PA aged cell 33/100soc/J1PAaged33_throughplane_100soc_35-40.csv'
 T_S = 40 # deg C, final temperature
 
 heat_flux_sign = -1 # 1 or -1; 1 means heat flux entering the cell is positive; -1 means heat flux entering cell is negative
