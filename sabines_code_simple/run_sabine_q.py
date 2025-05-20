@@ -7,7 +7,7 @@ def round_sig(x, sig):
     return round(x, sig-int(math.floor(math.log10(abs(x))))-1)
 
 def calculate_heatflux_subtract_losses(heatflux_data):
-    loss_start_index = len(HeatfluxData.average_heatflux) - 300 # 300 seconds before final measurement; to determine the average loss using final 500 points
+    loss_start_index = len(HeatfluxData.average_heatflux) - 500 # 500 seconds before final measurement; to determine the average loss using final 500 points
     loss_calc_times = HeatfluxData["time_elapsed"][loss_start_index:]  # Corresponding time values
     heatflux_subtract_losses = pd.DataFrame()
     for col in HeatfluxData.columns:
