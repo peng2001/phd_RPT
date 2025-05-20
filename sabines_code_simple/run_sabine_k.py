@@ -86,7 +86,7 @@ def round_sig(x, sig):
 def graph_heat_vs_time_and_fitted_eqn(exp_time, exp_heatflux, adjusted_heat_flux, conductivity, diffusivity, heat_flux_offset):
     linspace_time = np.arange(exp_time[0]+fitting_time_skip, exp_time[-1], 1)
     fitted_heat_flux = [step_change_heat_flux(t, conductivity, diffusivity, heat_flux_offset) for t in linspace_time]
-    plt.plot(exp_time, exp_heatflux, label="Experimental", color="blue")
+    # plt.plot(exp_time, exp_heatflux, label="Experimental", color="blue")
     plt.plot(exp_time, adjusted_heat_flux, label="Experimental with Losses Removed", color="purple")
     plt.plot(linspace_time, fitted_heat_flux, label="Final Fitted Equation", color="red")
     linspace_time_overshoot = np.arange(2, fitting_time_skip+1, 1)
@@ -146,7 +146,6 @@ def run_fitting():
     initial_loss_index = next(i for i, t in enumerate(HeatfluxData.time_elapsed) if t >= start_change_tempreature_time) - 5 # 5 points before the start time to get initial loss
     prev_100_points = HeatfluxData.average_heatflux[(initial_loss_index-100):initial_loss_index] # get prev 100 points to get the average initial loss
     initial_loss_estimate = (sum(prev_100_points) / len(prev_100_points)) * S_final / S_initial # multiply by S_final / S_initial because different calibration temperature before step change
-    # print("Initial loss: "+str(initial_loss_estimate))
 
     fitted_initial, fitted_asymptote, fitted_tau = fit_exponential(time_window_for_fitting, heat_fluxes_for_fitting)
     # print("Final loss: "+str(fitted_asymptote))
@@ -156,6 +155,8 @@ def run_fitting():
     # print(fitted_tau)
     losses = [exponential(t, initial=initial_loss_estimate, asymptote=fitted_asymptote, tau=fitted_tau) for t in time_window]
     # losses = np.zeros(len(time_window))+fitted_asymptote
+    # print("Initial loss: "+str(initial_loss_estimate))
+    # print("Final loss: "+str(fitted_asymptote))
     linspace_time = np.arange(time_window[0]+fitting_time_skip, time_window[-1], 1)
     adjusted_heat_flux = np.subtract(heat_fluxes, losses)
     adjusted_heat_fluxes_for_fitting = [adjusted_heat_flux[i] for i in range(len(time_window)) if time_window[i] >= fitting_time_skip]
@@ -183,7 +184,7 @@ def run_fitting():
     diffusivity_error = (diffusivityEminus5_error)*10**(-5)
     # print("Heat flux offset: "+str(round_4_sig(heat_flux_offset))+" W/m^2")
     # graph_heat_vs_time(HeatfluxData.time_elapsed, HeatfluxData.average_heatflux)
-    # graph_heat_vs_time_and_fitted_eqn(time_window, heat_fluxes, adjusted_heat_flux, conductivity,diffusivityEminus5,heat_flux_offset=0)
+    graph_heat_vs_time_and_fitted_eqn(time_window, heat_fluxes, adjusted_heat_flux, conductivity,diffusivityEminus5,heat_flux_offset=0)
 
     return conductivity, diffusivity, conductivity_error, diffusivity_error
 

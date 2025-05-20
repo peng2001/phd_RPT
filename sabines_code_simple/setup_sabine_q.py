@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 from io import StringIO
-heatflux_file = 'data/J1PA aged cell 33/50soc/J1PAaged33_heatgen_50soc_1.5C_25deg.csv'
+heatflux_file = 'data/Sabines Rig J1PA/J1PA_heatgen_1.5C_25deg.csv'
 T_S = 25 # deg C, final temperature
 
 heat_flux_sign = -1 # 1 or -1; 1 means heat flux entering the cell is positive; -1 means heat flux entering cell is negative
@@ -53,6 +53,7 @@ for column in sensor_data.columns[1:]:
 # HeatfluxData.drop(columns=['HeatFluxA0_C05', 'HeatFluxC0_D01', 'HeatFluxD0_D07', 'HeatFluxB0_C13'], inplace=True)
 HeatfluxData["average_heatflux"] = HeatfluxData.iloc[:, 1:].mean(axis=1)
 HeatfluxData["time_elapsed"] = HeatfluxData['time'].apply(lambda t: t.hour * 3600 + t.minute * 60 + t.second)
+HeatfluxData["time_elapsed"] -= HeatfluxData["time_elapsed"][0]
 HeatfluxData = HeatfluxData.dropna()
 
 # graphing data
